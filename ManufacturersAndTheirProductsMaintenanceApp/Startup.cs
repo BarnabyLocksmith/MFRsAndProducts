@@ -10,12 +10,14 @@ namespace ManufacturersAndTheirProductsMaintenanceApp
 {
     public class Startup
     {
+        public static readonly Guid UserGuid = Guid.NewGuid();
+
+        public IConfiguration Configuration { get; }
+
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
         }
-
-        public IConfiguration Configuration { get; }
 
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
@@ -25,12 +27,14 @@ namespace ManufacturersAndTheirProductsMaintenanceApp
                 cfg.UseSqlServer(Configuration.GetConnectionString("MFRsAndProductsDbConnectionString"));
             });
 
+            services.AddTransient<MFRsAndProductsSeeder>();
+
             services.AddScoped<IMFRsAndProductsRepository, MFRsAndProductsRepository>();
             services.AddMvc();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+        public void Configure(IApplicationBuilder app, IHostingEnvironment env, MFRsAndProductsSeeder seeder)
         {
             if (env.IsDevelopment())
             {
@@ -38,6 +42,12 @@ namespace ManufacturersAndTheirProductsMaintenanceApp
             }
 
             app.UseMvc();
+
+            using (var scope = app.ApplicationServices.CreateScope())
+            {
+                seeder = scope.ServiceProvider.GetService<MFRsAndProductsSeeder>();
+                seeder.Seed();
+            }
         }
     }
 }
