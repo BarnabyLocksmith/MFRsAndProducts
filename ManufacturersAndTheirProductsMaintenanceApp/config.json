@@ -1,5 +1,5 @@
 ﻿{
   "ConnectionStrings": {
-    "MFRsAndProductsDbConnectionString": "server=(localdb)\\MSSQLLocalDB;Database=MAndPDb;Integrated Security=true;MultipleActiveResultSets=true;"
+    "MFRsAndProductsDbConnectionString": "server=(localdb)\\MSSQLLocalDB;Database=MFRsAndPsDb;Integrated Security=true;MultipleActiveResultSets=true;"
   }
 }

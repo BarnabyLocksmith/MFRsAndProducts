@@ -12,7 +12,5 @@ namespace ManufacturersAndTheirProductsMaintenanceApp.Data
         public DbSet<Manufacturer> Manufacturers {get; set; }
 
         public DbSet<Product> Products { get; set; }
-
-
     }
 }
