@@ -1,0 +1,39 @@
+﻿@model IReadOnlyList<ManufacturerModel>
+    
+<link rel="stylesheet" href="~/css/table.css">
+
+<html>
+<body>
+    <div>
+    <h2>@ViewBag.Title</h2>
+        <table>
+            <tr>
+                <th>Id</th>
+                <th>Name</th>
+                <th>Logo</th>
+                <th>Created datetime</th>
+                <th>Created by</th>
+                <th>Last Changed by</th>
+                <th>Last Changed dateTime</th>
+            </tr>
+
+            @foreach (var item in @Model)
+            {
+                <tr>
+                    <td>@item.Id</td>
+                    <td>@item.Name</td>
+                    <td>@item.Logo</td>
+                    <td>@item.CreatedDateTime</td>
+                    <td>@item.CreatedBy</td>
+                    <td>@item.LastChangedBy</td>
+                    <td>@item.LastChangedDateTime</td>
+                </tr>
+            }
+
+        </table>
+
+    </div>
+
+</body>
+</html>
+

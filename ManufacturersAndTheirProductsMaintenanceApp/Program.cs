@@ -23,8 +23,6 @@ namespace ManufacturersAndTheirProductsMaintenanceApp
 
             builder.AddJsonFile("config.json", false, true)
                 .AddEnvironmentVariables();
-
-
         }
     }
 }

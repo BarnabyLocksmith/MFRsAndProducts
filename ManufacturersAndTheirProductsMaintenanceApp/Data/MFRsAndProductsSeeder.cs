@@ -43,19 +43,19 @@ namespace ManufacturersAndTheirProductsMaintenanceApp.Data
             if (manufacturer != null)
             {
 
-                var manufacturerItemList = new List<ManufacturerProduct>();
+                var manufacturerItemList = new List<ManufacturerItem>();
 
                 foreach (var product in Context.Products)
                 {
                     manufacturerItemList.Add(
-                        new ManufacturerProduct
+                        new ManufacturerItem
                         {
                             Product = product,
                             Manufacturer = manufacturer
                         });
                 }
 
-                manufacturer.ManufacturerProducts = manufacturerItemList;
+                manufacturer.Products = manufacturerItemList;
             }
 
             Context.SaveChanges();

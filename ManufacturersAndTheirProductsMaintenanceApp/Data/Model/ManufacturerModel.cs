@@ -1,17 +1,16 @@
-﻿using System;
+﻿using ManufacturersAndTheirProductsMaintenanceApp.Data.Entities;
+using System;
 using System.Collections.Generic;
 
-namespace ManufacturersAndTheirProductsMaintenanceApp.Data.Entities
+namespace ManufacturersAndTheirProductsMaintenanceApp.Data.Model
 {
-    public class Manufacturer
+    public class ManufacturerModel
     {
         public int Id { get; set; }
 
         public string Name { get; set; }
 
         public string Logo { get; set; }
-
-        public ICollection<ManufacturerItem> Products { get; set; }
 
         public DateTime CreatedDateTime { get; set; }
 

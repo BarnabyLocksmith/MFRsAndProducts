@@ -41,7 +41,16 @@ namespace ManufacturersAndTheirProductsMaintenanceApp
                 app.UseDeveloperExceptionPage();
             }
 
-            app.UseMvc();
+            app.UseStaticFiles();
+
+            app.UseMvc(cfg =>
+            {
+                cfg.MapRoute(
+                    "Default",
+                    "{controller}/{action}/{id?}",
+                    new { controller = "App", Action = "Index" }
+                );
+            });
 
             using (var scope = app.ApplicationServices.CreateScope())
             {

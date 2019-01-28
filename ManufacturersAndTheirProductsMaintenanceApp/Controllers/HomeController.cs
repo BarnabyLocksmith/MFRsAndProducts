@@ -2,18 +2,26 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using ManufacturersAndTheirProductsMaintenanceApp.Data;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ManufacturersAndTheirProductsMaintenanceApp.Controllers
 {
-    [Route("api/[controller]")]
-    public class ValuesController : Controller
+    [Route("home/index/")]
+    public class HomeController : Controller
     {
-        // GET api/values
-        [HttpGet]
-        public IEnumerable<string> Get()
+        private readonly IMFRsAndProductsRepository Repository;
+
+        public HomeController(IMFRsAndProductsRepository repository)
         {
-            return new string[] { "value1", "value2" };
+            this.Repository = repository;
+        }
+
+        public IActionResult Index()
+        {
+            ViewBag.Title = "List of manufacturers";
+            var manufacturers = Repository.GetManufacturers();
+            return View(manufacturers);
         }
 
         // GET api/values/5
