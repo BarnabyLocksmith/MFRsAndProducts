@@ -1,22 +1,23 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using ManufacturersAndTheirProductsMaintenanceApp.Data;
+using ManufacturersAndTheirProductsMaintenanceApp.Data.Entities;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ManufacturersAndTheirProductsMaintenanceApp.Controllers
 {
-    [Route("home/index/")]
+    [Route("home")]
     public class HomeController : Controller
     {
+        private readonly MFRsAndProductsContext Context;
         private readonly IMFRsAndProductsRepository Repository;
 
-        public HomeController(IMFRsAndProductsRepository repository)
+        public HomeController(MFRsAndProductsContext context, IMFRsAndProductsRepository repository)
         {
+            this.Context = context;
             this.Repository = repository;
         }
 
+        [HttpGet("index")]
         public IActionResult Index()
         {
             ViewBag.Title = "List of manufacturers";
@@ -24,29 +25,40 @@ namespace ManufacturersAndTheirProductsMaintenanceApp.Controllers
             return View(manufacturers);
         }
 
-        // GET api/values/5
-        [HttpGet("{id}")]
-        public string Get(int id)
+        [HttpGet("create")]
+        public IActionResult CreateManufacturer()
         {
-            return "value";
+            ViewBag.Title = "Create new manufacturer";
+            return View();
         }
 
-        // POST api/values
-        [HttpPost]
-        public void Post([FromBody]string value)
+        [HttpPost("create")]
+        public IActionResult CreateManufacturer(Manufacturer newManufacturer)
         {
+            Context.Manufacturers.Add(new Manufacturer()
+            {
+                CreatedBy = Startup.UserGuid,
+                CreatedDateTime = DateTime.Now,
+                LastChangedBy = Startup.UserGuid,
+                LastChangedDateTime = DateTime.Now,
+                Logo = newManufacturer.Logo,
+                Name = newManufacturer.Name
+            });
+
+            Context.SaveChanges();
+
+            ViewBag.Title = "Manufacturer has been added!";
+            return View("Result");
         }
 
-        // PUT api/values/5
-        [HttpPut("{id}")]
-        public void Put(int id, [FromBody]string value)
+        [HttpPost("delete/{id}")]
+        public IActionResult DeleteManufacturer(int id)
         {
-        }
-
-        // DELETE api/values/5
-        [HttpDelete("{id}")]
-        public void Delete(int id)
-        {
+            Repository.DeleteManufacturer(id);
+            Response.Redirect(Request.PathBase);
+            
+            ViewBag.Title = "Manufacturer has been deleted!";
+            return View("Result");
         }
     }
 }

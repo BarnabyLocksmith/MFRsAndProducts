@@ -6,5 +6,7 @@ namespace ManufacturersAndTheirProductsMaintenanceApp.Data
     public interface IMFRsAndProductsRepository
     {
         IReadOnlyList<ManufacturerModel> GetManufacturers();
+
+        void DeleteManufacturer(int id);
     }
 }

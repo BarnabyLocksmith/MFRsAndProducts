@@ -27,6 +27,11 @@
                     <td>@item.CreatedBy</td>
                     <td>@item.LastChangedBy</td>
                     <td>@item.LastChangedDateTime</td>
+                    <td>
+                        <form action="delete/@item.Id" method="POST">
+                            <input type="submit" class="btn btn-primary btn-lg" value="Delete" />
+                        </form>
+                    </td>
                 </tr>
             }
 

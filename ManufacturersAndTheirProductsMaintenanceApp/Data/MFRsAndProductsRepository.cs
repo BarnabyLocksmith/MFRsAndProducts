@@ -15,6 +15,22 @@ namespace ManufacturersAndTheirProductsMaintenanceApp.Data
             this.Context = Context;
         }
 
+        public void DeleteManufacturer(int id)
+        {
+            try
+            {
+                var deletableManufacturer = Context.Manufacturers.Where(manufacturer => manufacturer.Id == id).Single();
+
+                Context.Manufacturers.Remove(deletableManufacturer);
+                Context.SaveChanges();
+            }
+            catch (System.Exception)
+            {
+
+                throw;
+            }
+        }
+
         public IReadOnlyList<ManufacturerModel> GetManufacturers()
         {
             var manufacturers = Context.Manufacturers
