@@ -1,6 +1,6 @@
 ﻿using System;
 using ManufacturersAndTheirProductsMaintenanceApp.Data;
-using ManufacturersAndTheirProductsMaintenanceApp.Data.Entities;
+using ManufacturersAndTheirProductsMaintenanceApp.Data.Model;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ManufacturersAndTheirProductsMaintenanceApp.Controllers
@@ -33,22 +33,11 @@ namespace ManufacturersAndTheirProductsMaintenanceApp.Controllers
         }
 
         [HttpPost("create")]
-        public IActionResult CreateManufacturer(Manufacturer newManufacturer)
+        public IActionResult CreateManufacturer(ManufacturerModel newManufacturer)
         {
-            Context.Manufacturers.Add(new Manufacturer()
-            {
-                CreatedBy = Startup.UserGuid,
-                CreatedDateTime = DateTime.Now,
-                LastChangedBy = Startup.UserGuid,
-                LastChangedDateTime = DateTime.Now,
-                Logo = newManufacturer.Logo,
-                Name = newManufacturer.Name
-            });
+            Repository.CreateManufacturer(newManufacturer);
 
-            Context.SaveChanges();
-
-            ViewBag.Title = "Manufacturer has been added!";
-            return View("Result");
+            return Redirect($"{this.Request.Scheme}://{this.Request.Host}{this.Request.PathBase}/home/create");
         }
 
         [HttpPost("delete/{id}")]
@@ -57,8 +46,7 @@ namespace ManufacturersAndTheirProductsMaintenanceApp.Controllers
             Repository.DeleteManufacturer(id);
             Response.Redirect(Request.PathBase);
             
-            ViewBag.Title = "Manufacturer has been deleted!";
-            return View("Result");
+            return Redirect($"{this.Request.Scheme}://{this.Request.Host}{this.Request.PathBase}/home/index");
         }
     }
 }

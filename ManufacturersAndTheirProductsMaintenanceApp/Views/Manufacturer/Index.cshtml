@@ -1,0 +1,45 @@
+﻿@model ManufacturerModel
+<html>
+<body>
+    <h2>@ViewBag.Title</h2>
+
+    <link rel="stylesheet" href="~/css/table.css">
+
+    <div>
+        <h2>@ViewBag.Title</h2>
+        <table>
+            <tr>
+                <th>Id</th>
+                <th>Name</th>
+                <th>Logo</th>
+                <th>Created datetime</th>
+                <th>Created by</th>
+                <th>Last Changed by</th>
+                <th>Last Changed dateTime</th>
+                <th>Delete</th>
+            </tr>
+
+            @foreach (var product in @Model.Products)
+            {
+                <tr>
+                    <td>@product.Id</td>
+                    <td>@product.Name</td>
+                    <td>@product.Image</td>
+                    <td>@product.CreatedDateTime</td>
+                    <td>@product.CreatedBy</td>
+                    <td>@product.LastChangedBy</td>
+                    <td>@product.LastChangedDateTime</td>
+                    <td>
+                        <form action="@Model.Id/delete/@product.Id" method="POST">
+                            <input type="submit" class="btn btn-primary btn-lg" value="Delete" />
+                        </form>
+                    </td>
+                </tr>
+            }
+
+        </table>
+
+    </div>
+</body>
+</html>
+

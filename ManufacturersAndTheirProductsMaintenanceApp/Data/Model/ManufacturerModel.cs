@@ -19,5 +19,7 @@ namespace ManufacturersAndTheirProductsMaintenanceApp.Data.Model
         public DateTime LastChangedDateTime { get; set; }
 
         public Guid LastChangedBy { get; set; }
+
+        public IEnumerable<Product> Products { get; set; }
     }
 }

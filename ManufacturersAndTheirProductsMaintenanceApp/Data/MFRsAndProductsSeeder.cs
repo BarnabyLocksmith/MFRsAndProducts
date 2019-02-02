@@ -55,7 +55,7 @@ namespace ManufacturersAndTheirProductsMaintenanceApp.Data
                         });
                 }
 
-                manufacturer.Products = manufacturerItemList;
+                manufacturer.Items = manufacturerItemList;
             }
 
             Context.SaveChanges();
