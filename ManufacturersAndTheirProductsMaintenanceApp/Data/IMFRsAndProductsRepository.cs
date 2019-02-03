@@ -9,13 +9,13 @@ namespace ManufacturersAndTheirProductsMaintenanceApp.Data
 
         IReadOnlyList<ManufacturerModel> GetManufacturers();
 
-        void CreateManufacturer(ManufacturerModel newManufacturer);
+        void CreateManufacturer(string name, byte[] logo);
 
-        void CreateProduct(int mfrId, ProductModel newProduct);
+        void CreateProduct(int mfrId, string name, byte[] image);
 
-        void UpdateManufacturer(ManufacturerModel updatedManufacturerData);
-
-        void UpdateProduct(int mfrId, ProductModel updatedProductData);
+        void UpdateManufacturer(int id, string name, byte[] logo);
+        
+        void UpdateProduct(int mfrId, int productId, string name, byte[] image);
 
         void DeleteManufacturer(int id);
 

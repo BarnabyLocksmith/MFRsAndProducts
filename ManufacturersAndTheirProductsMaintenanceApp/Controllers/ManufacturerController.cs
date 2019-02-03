@@ -1,6 +1,8 @@
 ﻿using System;
+using System.IO;
 using ManufacturersAndTheirProductsMaintenanceApp.Data;
 using ManufacturersAndTheirProductsMaintenanceApp.Data.Model;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 // For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
@@ -23,25 +25,30 @@ namespace ManufacturersAndTheirProductsMaintenanceApp.Controllers
         {
             var manufacturer = Repository.GetManufacturer(id);
 
-            ViewBag.Title = $"Info of {manufacturer.Name}";
+            ViewBag.Title = $"Products of {manufacturer.Name}";
             return View(manufacturer);
         }
 
         [HttpGet("create")]
         public IActionResult CreateProduct()
         {
-            ViewBag.Title = $"Create new product";
+            var currentMfrId = Convert.ToInt32(this.RouteData.Values["id"]);
+            var manufacturerName = Repository.GetManufacturer(currentMfrId).Name;
+
+            ViewBag.Title = $"Create new product for {manufacturerName}";
 
             return View();
         }
 
         [HttpPost("create")]
-        public IActionResult CreateProduct(ProductModel newProduct)
+        public IActionResult CreateProduct(string name, IFormFile image)
         {
             var currentMfrId = Convert.ToInt32(this.RouteData.Values["id"]);
-            ViewBag.Title = $"Create new product";
+            ViewBag.Title = "Create new product";
 
-            Repository.CreateProduct(currentMfrId, newProduct);
+            var logoByteArray = fileToByteArray(image);
+
+            Repository.CreateProduct(currentMfrId, name, logoByteArray);
 
             return Redirect($"{this.Request.Scheme}://{this.Request.Host}{this.Request.PathBase}/manufacturer/{currentMfrId}/create");
         }
@@ -57,12 +64,19 @@ namespace ManufacturersAndTheirProductsMaintenanceApp.Controllers
         }
 
         [HttpPost("update/{productId}")]
-        public IActionResult UpdateProduct(int productId, ProductModel updatedProduct)
+        public IActionResult UpdateProduct(int productId, string name, IFormFile image)
         {
             var currentMfrId = Convert.ToInt32(this.RouteData.Values["id"]);
+            byte[] imageByteArray = Array.Empty<byte>();
+            
             ViewBag.Title = $"Update product page";
 
-            Repository.UpdateProduct(currentMfrId, updatedProduct);
+            if (image != null)
+            {
+                imageByteArray = fileToByteArray(image);
+            }
+
+            Repository.UpdateProduct(currentMfrId, productId, name, imageByteArray);
 
             return Redirect($"{this.Request.Scheme}://{this.Request.Host}{this.Request.PathBase}/manufacturer/{currentMfrId}/update");
         }
@@ -74,6 +88,15 @@ namespace ManufacturersAndTheirProductsMaintenanceApp.Controllers
             Repository.DeleteProduct(currentMfrId, productId);
 
             return Redirect($"{this.Request.Scheme}://{this.Request.Host}{this.Request.PathBase}/manufacturer/{currentMfrId}");
+        }
+        
+        private static byte[] fileToByteArray(IFormFile logo)
+        {
+            using (var ms = new MemoryStream())
+            {
+                logo.CopyTo(ms);
+                return ms.ToArray();
+            }
         }
     }
 }

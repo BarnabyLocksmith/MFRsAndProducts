@@ -1,6 +1,8 @@
 ﻿using System;
+using System.IO;
 using ManufacturersAndTheirProductsMaintenanceApp.Data;
 using ManufacturersAndTheirProductsMaintenanceApp.Data.Model;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ManufacturersAndTheirProductsMaintenanceApp.Controllers
@@ -33,9 +35,11 @@ namespace ManufacturersAndTheirProductsMaintenanceApp.Controllers
         }
 
         [HttpPost("create")]
-        public IActionResult CreateManufacturer(ManufacturerModel newManufacturer)
+        public IActionResult CreateManufacturer(string name, IFormFile logo)
         {
-            Repository.CreateManufacturer(newManufacturer);
+            byte[] logoBytes = fileToByteArray(logo);
+
+            Repository.CreateManufacturer(name, logoBytes);
 
             return Redirect($"{this.Request.Scheme}://{this.Request.Host}{this.Request.PathBase}/home/create");
         }
@@ -49,11 +53,18 @@ namespace ManufacturersAndTheirProductsMaintenanceApp.Controllers
         }
 
         [HttpPost("update/{manufacturerId}")]
-        public IActionResult UpdateManufacturer(int manufacturerId, ManufacturerModel updatedManufacturerData)
+        public IActionResult UpdateManufacturer(int manufacturerId, string name, IFormFile logo)
         {
             ViewBag.Title = $"Update manufacturer page";
+            
+            byte[] logoByteArray = Array.Empty<byte>();
 
-            Repository.UpdateManufacturer(updatedManufacturerData);
+            if (logo != null)
+            {
+                logoByteArray = fileToByteArray(logo);
+            }
+            
+            Repository.UpdateManufacturer(manufacturerId, name, logoByteArray);
 
             return Redirect($"{this.Request.Scheme}://{this.Request.Host}{this.Request.PathBase}/home/index");
         }
@@ -65,6 +76,15 @@ namespace ManufacturersAndTheirProductsMaintenanceApp.Controllers
             Response.Redirect(Request.PathBase);
             
             return Redirect($"{this.Request.Scheme}://{this.Request.Host}{this.Request.PathBase}/home/index");
+        }
+        
+        private static byte[] fileToByteArray(IFormFile logo)
+        {
+            using (var ms = new MemoryStream())
+            {
+                logo.CopyTo(ms);
+                return ms.ToArray();
+            }
         }
     }
 }

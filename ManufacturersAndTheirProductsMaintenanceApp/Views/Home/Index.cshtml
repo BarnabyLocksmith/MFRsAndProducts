@@ -1,11 +1,11 @@
 ﻿@model IReadOnlyList<ManufacturerModel>
-    
+
 <link rel="stylesheet" href="~/css/table.css">
 
 <html>
 <body>
     <div>
-    <h2>@ViewBag.Title</h2>
+        <h2>@ViewBag.Title</h2>
         <table>
             <tr>
                 <th>Id</th>
@@ -23,7 +23,17 @@
                 <tr>
                     <td>@item.Id</td>
                     <td>@item.Name</td>
-                    <td>@item.Logo</td>
+                    <td>
+                        @{
+                            var imgSrc = string.Empty;
+                            if (item.Logo != null)
+                            {
+                                var base64 = Convert.ToBase64String(item.Logo);
+                                imgSrc = String.Format("data:image/png;base64,{0}", base64);
+                            }
+                        }
+                        <img src="@imgSrc" /> 
+                    </td>
                     <td>@item.CreatedDateTime</td>
                     <td>@item.CreatedBy</td>
                     <td>@item.LastChangedBy</td>

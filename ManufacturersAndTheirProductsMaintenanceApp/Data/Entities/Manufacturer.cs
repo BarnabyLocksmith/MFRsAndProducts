@@ -9,7 +9,7 @@ namespace ManufacturersAndTheirProductsMaintenanceApp.Data.Entities
 
         public string Name { get; set; }
 
-        public string Logo { get; set; }
+        public byte[] Logo { get; set; }
 
         public ICollection<ManufacturerItem> Items { get; set; }
 

@@ -16,7 +16,7 @@ namespace ManufacturersAndTheirProductsMaintenanceApp.Data
             this.Context = Context;
         }
 
-        public void CreateProduct(int mfrId, ProductModel newProduct)
+        public void CreateProduct(int mfrId, string name, byte[] image)
         {
             Manufacturer manufacturer = GetManufacturerWithIncludes(mfrId);
 
@@ -25,8 +25,8 @@ namespace ManufacturersAndTheirProductsMaintenanceApp.Data
                 Manufacturer = manufacturer,
                 Product = new Product
                 {
-                    Name = newProduct.Name,
-                    Image = newProduct.Image,
+                    Name = name,
+                    Image = image,
                     CreatedBy = Startup.UserGuid,
                     CreatedDateTime = DateTime.Now,
                     LastChangedBy = Startup.UserGuid,
@@ -37,7 +37,7 @@ namespace ManufacturersAndTheirProductsMaintenanceApp.Data
             Context.SaveChanges();
         }
 
-        public void CreateManufacturer(ManufacturerModel newManufacturer)
+        public void CreateManufacturer(string name, byte[] logo)
         {
             Context.Manufacturers.Add(new Manufacturer()
             {
@@ -45,19 +45,25 @@ namespace ManufacturersAndTheirProductsMaintenanceApp.Data
                 CreatedDateTime = DateTime.Now,
                 LastChangedBy = Startup.UserGuid,
                 LastChangedDateTime = DateTime.Now,
-                Logo = newManufacturer.Logo,
-                Name = newManufacturer.Name
+                Logo = logo,
+                Name = name
             });
 
             Context.SaveChanges();
         }
         
-        public void UpdateManufacturer(ManufacturerModel updatedManufacturerData)
+        public void UpdateManufacturer(int id, string name, byte[] logo)
         {
-            var updatableManufacturer = GetManufacturerWithIncludes(updatedManufacturerData.Id);
+            var updatableManufacturer = GetManufacturerWithIncludes(id);
             
-            updatableManufacturer.Name = updatedManufacturerData.Name;
-            updatableManufacturer.Logo = updatedManufacturerData.Logo;
+            updatableManufacturer.Name = name;
+
+            if (logo.Length != 0)
+            {
+                updatableManufacturer.Logo = logo;
+
+            }
+
             updatableManufacturer.LastChangedBy = Startup.UserGuid;
             updatableManufacturer.LastChangedDateTime = DateTime.Now;
 
@@ -67,11 +73,11 @@ namespace ManufacturersAndTheirProductsMaintenanceApp.Data
             Context.SaveChanges();
         }
 
-        public void UpdateProduct(int mfrId, ProductModel updatedProductData)
+        public void UpdateProduct(int mfrId, int productId, string productName, byte[] image)
         {
             var manufacturer = GetManufacturerWithIncludes(mfrId);
 
-            var manufacturerItem = manufacturer.Items.Where(mfrItem => mfrItem.Product.Id == updatedProductData.Id).Single();
+            var manufacturerItem = manufacturer.Items.Where(mfrItem => mfrItem.Product.Id == productId).Single();
             var oldProduct = manufacturerItem.Product;
 
             Context.Products.Remove(oldProduct);
@@ -80,14 +86,13 @@ namespace ManufacturersAndTheirProductsMaintenanceApp.Data
 
             var product = new Product
             {
-                Name = updatedProductData.Name,
-                Image = updatedProductData.Image,
+                Name = productName,
+                Image = image.Length == 0 ? oldProduct.Image : image,
                 CreatedBy = oldProduct.CreatedBy,
                 CreatedDateTime = oldProduct.CreatedDateTime,
                 LastChangedBy = Startup.UserGuid,
                 LastChangedDateTime = DateTime.Now
             };
-
 
             manufacturer.Items.Remove(manufacturerItem);
             Context.Entry(manufacturerItem).State = EntityState.Deleted;

@@ -1,24 +1,35 @@
 ﻿@model ManufacturerModel
+
+<link rel="stylesheet" href="~/css/table.css">
+
 <html>
 <body>
-
-    <link rel="stylesheet" href="~/css/table.css">
-
     <div>
         <h2>@ViewBag.Title</h2>
-        <form action="@Model.Id" method="POST">
+        <form action="@Model.Id" method="POST" enctype="multipart/form-data">
             <table>
+                <tr>
+                    <th>Id</th>
+                    <th>Name</th>
+                    <th>Logo</th>
+                    <th>Created datetime</th>
+                    <th>Created by</th>
+                    <th>Last Changed by</th>
+                    <th>Last Changed datetime</th>
+                    <th>Update</th>
+                </tr>
+
                 <tr>
                     <td>
                         <input type="text" data-val="true"
-                            id="Id" name="Id" value="@Model.Id" readonly/></td>
-                    <td>
-                        <input type="text" data-val="true"
-                            id="Name" name="Name" value="@Model.Name" />
+                               id="Id" name="Id" value="@Model.Id" readonly />
                     </td>
                     <td>
-                        <input type="file" data-val="true"
-                            id="Image" name="Image" value="@Model.Logo" />
+                        <input type="text" data-val="true"
+                               id="Name" name="Name" value="@Model.Name" />
+                    </td>
+                    <td>
+                        <input asp-for="Logo" type="file" accept="image/png" class="form-control" />
                     </td>
                     <td>@Model.CreatedDateTime</td>
                     <td>@Model.CreatedBy</td>

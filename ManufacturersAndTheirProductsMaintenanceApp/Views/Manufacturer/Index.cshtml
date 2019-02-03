@@ -23,7 +23,17 @@
                 <tr>
                     <td>@product.Id</td>
                     <td>@product.Name</td>
-                    <td>@product.Image</td>
+                    <td>                        
+                        @{
+                            var imgSrc = string.Empty;
+                            if (product.Image != null)
+                            {
+                                var base64 = Convert.ToBase64String(product.Image);
+                                imgSrc = String.Format("data:image/png;base64,{0}", base64);
+                            }
+                        }
+                        <img src="@imgSrc" />
+                    </td>
                     <td>@product.CreatedDateTime</td>
                     <td>@product.CreatedBy</td>
                     <td>@product.LastChangedBy</td>

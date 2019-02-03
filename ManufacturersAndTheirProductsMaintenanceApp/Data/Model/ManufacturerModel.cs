@@ -10,7 +10,7 @@ namespace ManufacturersAndTheirProductsMaintenanceApp.Data.Model
 
         public string Name { get; set; }
 
-        public string Logo { get; set; }
+        public byte[] Logo { get; set; }
 
         public DateTime CreatedDateTime { get; set; }
 
