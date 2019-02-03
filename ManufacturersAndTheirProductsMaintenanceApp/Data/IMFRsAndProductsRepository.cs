@@ -13,6 +13,10 @@ namespace ManufacturersAndTheirProductsMaintenanceApp.Data
 
         void CreateProduct(int mfrId, ProductModel newProduct);
 
+        void UpdateManufacturer(ManufacturerModel updatedManufacturerData);
+
+        void UpdateProduct(int mfrId, ProductModel updatedProductData);
+
         void DeleteManufacturer(int id);
 
         void DeleteProduct(int mfrId, int productId);

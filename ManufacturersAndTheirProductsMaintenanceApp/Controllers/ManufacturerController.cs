@@ -46,6 +46,27 @@ namespace ManufacturersAndTheirProductsMaintenanceApp.Controllers
             return Redirect($"{this.Request.Scheme}://{this.Request.Host}{this.Request.PathBase}/manufacturer/{currentMfrId}/create");
         }
 
+        [HttpGet("update")]
+        public IActionResult UpdateProduct()
+        {
+            var currentMfrId = Convert.ToInt32(this.RouteData.Values["id"]);
+
+            ViewBag.Title = $"Update product page";
+
+            return View(Repository.GetManufacturer(currentMfrId));
+        }
+
+        [HttpPost("update/{productId}")]
+        public IActionResult UpdateProduct(int productId, ProductModel updatedProduct)
+        {
+            var currentMfrId = Convert.ToInt32(this.RouteData.Values["id"]);
+            ViewBag.Title = $"Update product page";
+
+            Repository.UpdateProduct(currentMfrId, updatedProduct);
+
+            return Redirect($"{this.Request.Scheme}://{this.Request.Host}{this.Request.PathBase}/manufacturer/{currentMfrId}/update");
+        }
+
         [HttpPost("delete/{productId}")]
         public IActionResult DeleteProduct(int productId)
         {

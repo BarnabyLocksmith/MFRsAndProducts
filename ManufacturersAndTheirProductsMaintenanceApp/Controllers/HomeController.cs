@@ -40,6 +40,24 @@ namespace ManufacturersAndTheirProductsMaintenanceApp.Controllers
             return Redirect($"{this.Request.Scheme}://{this.Request.Host}{this.Request.PathBase}/home/create");
         }
 
+        [HttpGet("update/{manufacturerId}")]
+        public IActionResult UpdateManufacturer(int manufacturerId)
+        {
+            ViewBag.Title = $"Update manufacturer page";
+
+            return View(Repository.GetManufacturer(manufacturerId));
+        }
+
+        [HttpPost("update/{manufacturerId}")]
+        public IActionResult UpdateManufacturer(int manufacturerId, ManufacturerModel updatedManufacturerData)
+        {
+            ViewBag.Title = $"Update manufacturer page";
+
+            Repository.UpdateManufacturer(updatedManufacturerData);
+
+            return Redirect($"{this.Request.Scheme}://{this.Request.Host}{this.Request.PathBase}/home/index");
+        }
+
         [HttpPost("delete/{id}")]
         public IActionResult DeleteManufacturer(int id)
         {

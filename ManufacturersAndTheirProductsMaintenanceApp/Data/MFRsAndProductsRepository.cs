@@ -50,8 +50,57 @@ namespace ManufacturersAndTheirProductsMaintenanceApp.Data
             });
 
             Context.SaveChanges();
-        }      
+        }
         
+        public void UpdateManufacturer(ManufacturerModel updatedManufacturerData)
+        {
+            var updatableManufacturer = GetManufacturerWithIncludes(updatedManufacturerData.Id);
+            
+            updatableManufacturer.Name = updatedManufacturerData.Name;
+            updatableManufacturer.Logo = updatedManufacturerData.Logo;
+            updatableManufacturer.LastChangedBy = Startup.UserGuid;
+            updatableManufacturer.LastChangedDateTime = DateTime.Now;
+
+            Context.Manufacturers.Update(updatableManufacturer);
+            Context.Entry(updatableManufacturer).State = EntityState.Modified;
+
+            Context.SaveChanges();
+        }
+
+        public void UpdateProduct(int mfrId, ProductModel updatedProductData)
+        {
+            var manufacturer = GetManufacturerWithIncludes(mfrId);
+
+            var manufacturerItem = manufacturer.Items.Where(mfrItem => mfrItem.Product.Id == updatedProductData.Id).Single();
+            var oldProduct = manufacturerItem.Product;
+
+            Context.Products.Remove(oldProduct);
+            Context.Entry(manufacturerItem.Product).State = EntityState.Deleted;
+            Context.SaveChanges();
+
+            var product = new Product
+            {
+                Name = updatedProductData.Name,
+                Image = updatedProductData.Image,
+                CreatedBy = oldProduct.CreatedBy,
+                CreatedDateTime = oldProduct.CreatedDateTime,
+                LastChangedBy = Startup.UserGuid,
+                LastChangedDateTime = DateTime.Now
+            };
+
+
+            manufacturer.Items.Remove(manufacturerItem);
+            Context.Entry(manufacturerItem).State = EntityState.Deleted;
+
+            manufacturer.Items.Add(new ManufacturerItem
+            {
+                Manufacturer = manufacturer,
+                Product = product
+            });
+            
+            Context.SaveChanges();
+        }
+
         public void DeleteManufacturer(int id)
         {
             try
