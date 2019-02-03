@@ -50,15 +50,24 @@ namespace ManufacturersAndTheirProductsMaintenanceApp.Data
             });
 
             Context.SaveChanges();
-        }
-
+        }      
+        
         public void DeleteManufacturer(int id)
         {
             try
             {
-                var deletableManufacturer = Context.Manufacturers.Where(manufacturer => manufacturer.Id == id).Single();
+                var deletableManufacturer = GetManufacturerWithIncludes(id);
+
+                var deletableManufacturerItems = deletableManufacturer.Items.ToList();
+
+                var deleatableProducts = deletableManufacturer.Items.Select(x => x.Product);
+
+                Context.Products.RemoveRange(deleatableProducts);
+
+                deletableManufacturer.Items.Clear();
 
                 Context.Manufacturers.Remove(deletableManufacturer);
+
                 Context.SaveChanges();
             }
             catch (System.Exception)
@@ -70,15 +79,14 @@ namespace ManufacturersAndTheirProductsMaintenanceApp.Data
 
         public void DeleteProduct(int mfrId, int productId)
         {
-            var manufacturer = Context.Manufacturers
-                .Include(mfr => mfr.Items)
-                .ThenInclude(mfrItem => mfrItem.Product)
-                .Where(mfr => mfr.Id == mfrId)
-                .Single();
+            var manufacturer = GetManufacturerWithIncludes(mfrId);
 
             var deletableProduct = manufacturer.Items.Where(x => x.Product.Id == productId).Single();
 
             manufacturer.Items.Remove(deletableProduct);
+
+            Context.Products.Remove(deletableProduct.Product);
+            Context.Entry(deletableProduct).State = EntityState.Deleted;
 
             Context.SaveChanges();
         }
