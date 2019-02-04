@@ -4,6 +4,8 @@ using ManufacturersAndTheirProductsMaintenanceApp.Data;
 using ManufacturersAndTheirProductsMaintenanceApp.Data.Model;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.Processing;
 
 // For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -46,7 +48,7 @@ namespace ManufacturersAndTheirProductsMaintenanceApp.Controllers
             var currentMfrId = Convert.ToInt32(this.RouteData.Values["id"]);
             ViewBag.Title = "Create new product";
 
-            var logoByteArray = fileToByteArray(image);
+            var logoByteArray = CreateResizedImageByteArray(image);
 
             Repository.CreateProduct(currentMfrId, name, logoByteArray);
 
@@ -73,7 +75,7 @@ namespace ManufacturersAndTheirProductsMaintenanceApp.Controllers
 
             if (image != null)
             {
-                imageByteArray = fileToByteArray(image);
+                imageByteArray = CreateResizedImageByteArray(image);
             }
 
             Repository.UpdateProduct(currentMfrId, productId, name, imageByteArray);
@@ -89,12 +91,45 @@ namespace ManufacturersAndTheirProductsMaintenanceApp.Controllers
 
             return Redirect($"{this.Request.Scheme}://{this.Request.Host}{this.Request.PathBase}/manufacturer/{currentMfrId}");
         }
-        
-        private static byte[] fileToByteArray(IFormFile logo)
+
+
+        private static byte[] CreateResizedImageByteArray(IFormFile image)
+        {
+            int newSize = 256;
+            byte[] imageBytes = FileToByteArray(image);
+
+            using (var outputStream = new MemoryStream())
+            {
+                using (var tempImage = Image.Load(imageBytes))
+                {
+                    double newImageHeight = newSize;
+                    double newImageWidth = newSize;
+
+                    if (tempImage.Width >= tempImage.Height)
+                    {
+                        double resolutionRate = (double)tempImage.Width / tempImage.Height;
+                        newImageHeight = newSize / resolutionRate;
+                    }
+                    else
+                    {
+                        double resolutionRate = (double)tempImage.Height / tempImage.Width;
+                        newImageWidth = newSize / resolutionRate;
+                    }
+                    tempImage.Mutate(ctx => ctx.Resize(Convert.ToInt32(newImageWidth), Convert.ToInt32(newImageHeight)));
+                    tempImage.SaveAsPng(outputStream);
+                }
+
+                imageBytes = outputStream.ToArray();
+            }
+
+            return imageBytes;
+        }
+
+        private static byte[] FileToByteArray(IFormFile image)
         {
             using (var ms = new MemoryStream())
             {
-                logo.CopyTo(ms);
+                image.CopyTo(ms);
                 return ms.ToArray();
             }
         }
