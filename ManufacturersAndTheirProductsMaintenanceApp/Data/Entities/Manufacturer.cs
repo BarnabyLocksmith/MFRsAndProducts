@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 
 namespace ManufacturersAndTheirProductsMaintenanceApp.Data.Entities
 {
@@ -7,6 +8,7 @@ namespace ManufacturersAndTheirProductsMaintenanceApp.Data.Entities
     {
         public int Id { get; set; }
 
+        [MaxLength(100)]
         public string Name { get; set; }
 
         public byte[] Logo { get; set; }
