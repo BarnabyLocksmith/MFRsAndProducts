@@ -4,6 +4,8 @@ using ManufacturersAndTheirProductsMaintenanceApp.Data;
 using ManufacturersAndTheirProductsMaintenanceApp.Data.Model;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.Processing;
 
 namespace ManufacturersAndTheirProductsMaintenanceApp.Controllers
 {
@@ -37,13 +39,12 @@ namespace ManufacturersAndTheirProductsMaintenanceApp.Controllers
         [HttpPost("create")]
         public IActionResult CreateManufacturer(string name, IFormFile logo)
         {
-            byte[] logoBytes = fileToByteArray(logo);
-
+            byte[] logoBytes = CreateResizedLogoByteArray(logo);
             Repository.CreateManufacturer(name, logoBytes);
 
             return Redirect($"{this.Request.Scheme}://{this.Request.Host}{this.Request.PathBase}/home/create");
         }
-
+        
         [HttpGet("update/{manufacturerId}")]
         public IActionResult UpdateManufacturer(int manufacturerId)
         {
@@ -61,7 +62,7 @@ namespace ManufacturersAndTheirProductsMaintenanceApp.Controllers
 
             if (logo != null)
             {
-                logoByteArray = fileToByteArray(logo);
+                logoByteArray = CreateResizedLogoByteArray(logo);
             }
             
             Repository.UpdateManufacturer(manufacturerId, name, logoByteArray);
@@ -77,8 +78,40 @@ namespace ManufacturersAndTheirProductsMaintenanceApp.Controllers
             
             return Redirect($"{this.Request.Scheme}://{this.Request.Host}{this.Request.PathBase}/home/index");
         }
-        
-        private static byte[] fileToByteArray(IFormFile logo)
+
+        private static byte[] CreateResizedLogoByteArray(IFormFile logo)
+        {
+            int newSize = 256;
+            byte[] logoBytes = FileToByteArray(logo);
+
+            using (var outputStream = new MemoryStream())
+            {
+                using (var image = Image.Load(logoBytes))
+                {
+                    double newImageHeight = newSize;
+                    double newImageWidth = newSize;
+
+                    if (image.Width >= image.Height)
+                    {
+                        double resolutionRate = (double) image.Width / image.Height;
+                        newImageHeight = newSize / resolutionRate;
+                    }
+                    else
+                    {
+                        double resolutionRate = (double) image.Height / image.Width;
+                        newImageWidth = newSize / resolutionRate;
+                    }
+                    image.Mutate(ctx => ctx.Resize(Convert.ToInt32(newImageWidth), Convert.ToInt32(newImageHeight)));
+                    image.SaveAsPng(outputStream);
+                }
+
+                logoBytes = outputStream.ToArray();
+            }
+
+            return logoBytes;
+        }
+
+        private static byte[] FileToByteArray(IFormFile logo)
         {
             using (var ms = new MemoryStream())
             {
