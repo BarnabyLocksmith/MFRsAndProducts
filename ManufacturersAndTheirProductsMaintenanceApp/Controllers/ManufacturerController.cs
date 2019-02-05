@@ -1,7 +1,6 @@
 ﻿using System;
 using System.IO;
 using ManufacturersAndTheirProductsMaintenanceApp.Data;
-using ManufacturersAndTheirProductsMaintenanceApp.Data.Model;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using SixLabors.ImageSharp;
@@ -25,19 +24,36 @@ namespace ManufacturersAndTheirProductsMaintenanceApp.Controllers
 
         public IActionResult Index(int id)
         {
-            var manufacturer = Repository.GetManufacturer(id);
+            try
+            {
+                var manufacturer = Repository.GetManufacturer(id);
 
-            ViewBag.Title = $"Products of {manufacturer.Name}";
-            return View(manufacturer);
+                if (manufacturer == null)
+                {
+                    return NotFound();
+                }
+
+                ViewBag.Title = $"Products of {manufacturer.Name}";
+                return View(manufacturer);
+            }
+            catch (Exception e)
+            {
+                return BadRequest($"Failed to get manufacturer with the following id: {id}. {e}");
+            }
         }
 
         [HttpGet("create")]
         public IActionResult CreateProduct()
         {
             var currentMfrId = Convert.ToInt32(this.RouteData.Values["id"]);
-            var manufacturerName = Repository.GetManufacturer(currentMfrId).Name;
+            var manufacturer = Repository.GetManufacturer(currentMfrId);
 
-            ViewBag.Title = $"Create new product for {manufacturerName}";
+            if (manufacturer == null)
+            {
+                return NotFound();
+            }
+
+            ViewBag.Title = $"Create new product for {manufacturer.Name}";
 
             return View();
         }
@@ -45,6 +61,12 @@ namespace ManufacturersAndTheirProductsMaintenanceApp.Controllers
         [HttpPost("create")]
         public IActionResult CreateProduct(string name, IFormFile image)
         {
+            // If product creation is allowed without image, then null check for image is not required.
+            if (name == null || image == null)
+            {
+                return BadRequest($"Failed to create product, parameters are missing.");
+            }
+
             var currentMfrId = Convert.ToInt32(this.RouteData.Values["id"]);
             ViewBag.Title = "Create new product";
 
@@ -62,12 +84,29 @@ namespace ManufacturersAndTheirProductsMaintenanceApp.Controllers
 
             ViewBag.Title = $"Update product page";
 
-            return View(Repository.GetManufacturer(currentMfrId));
+            var currentManufacturer = Repository.GetManufacturer(currentMfrId);
+
+            if (currentManufacturer == null)
+            {
+                return NotFound();
+            }
+
+            return View(currentManufacturer);
         }
 
         [HttpPost("update/{productId}")]
         public IActionResult UpdateProduct(int productId, string name, IFormFile image)
         {
+            if (!Repository.IsProductExists(productId))
+            {
+                return NotFound();
+            }
+
+            if (name == null)
+            {
+                return BadRequest();
+            }
+
             var currentMfrId = Convert.ToInt32(this.RouteData.Values["id"]);
             byte[] imageByteArray = Array.Empty<byte>();
             
@@ -86,6 +125,11 @@ namespace ManufacturersAndTheirProductsMaintenanceApp.Controllers
         [HttpPost("delete/{productId}")]
         public IActionResult DeleteProduct(int productId)
         {
+            if (!Repository.IsProductExists(productId))
+            {
+                return NotFound();
+            }
+
             var currentMfrId = Convert.ToInt32(this.RouteData.Values["id"]);
             Repository.DeleteProduct(currentMfrId, productId);
 

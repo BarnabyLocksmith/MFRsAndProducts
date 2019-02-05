@@ -161,7 +161,7 @@ namespace ManufacturersAndTheirProductsMaintenanceApp.Data
                     LastChangedDateTime = manufacturer.LastChangedDateTime,
                     Products = manufacturer.Items.Select(x => x.Product)
                 })
-                .Single();
+                .SingleOrDefault();
         }
 
         public IReadOnlyList<ManufacturerModel> GetManufacturers()
@@ -179,6 +179,18 @@ namespace ManufacturersAndTheirProductsMaintenanceApp.Data
                 });
 
             return manufacturers.ToList();
+        }
+
+        public bool IsProductExists(int id)
+        {
+            var product = Context.Products.Where(p => p.Id == id).SingleOrDefault();
+
+            if (product == null)
+            {
+                return false;
+            }
+
+            return true;
         }
         
         private Manufacturer GetManufacturerWithIncludes(int mfrId)

@@ -1,7 +1,6 @@
 ﻿using System;
 using System.IO;
 using ManufacturersAndTheirProductsMaintenanceApp.Data;
-using ManufacturersAndTheirProductsMaintenanceApp.Data.Model;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using SixLabors.ImageSharp;
@@ -26,6 +25,12 @@ namespace ManufacturersAndTheirProductsMaintenanceApp.Controllers
         {
             ViewBag.Title = "List of manufacturers";
             var manufacturers = Repository.GetManufacturers();
+
+            if (manufacturers == null)
+            {
+                return NotFound();
+            }
+
             return View(manufacturers);
         }
 
@@ -39,6 +44,12 @@ namespace ManufacturersAndTheirProductsMaintenanceApp.Controllers
         [HttpPost("create")]
         public IActionResult CreateManufacturer(string name, IFormFile logo)
         {
+            // If product creation is allowed without image, then null check for image is not required.
+            if (name == null || logo == null)
+            {
+                return BadRequest($"Failed to create manufacturer, parameters are missing.");
+            }
+
             byte[] logoBytes = CreateResizedLogoByteArray(logo);
             Repository.CreateManufacturer(name, logoBytes);
 
@@ -64,7 +75,14 @@ namespace ManufacturersAndTheirProductsMaintenanceApp.Controllers
             {
                 logoByteArray = CreateResizedLogoByteArray(logo);
             }
-            
+
+            var currentManufacturer = Repository.GetManufacturer(manufacturerId);
+
+            if (currentManufacturer == null)
+            {
+                return NotFound();
+            }
+
             Repository.UpdateManufacturer(manufacturerId, name, logoByteArray);
 
             return Redirect($"{this.Request.Scheme}://{this.Request.Host}{this.Request.PathBase}/home/index");
@@ -73,6 +91,13 @@ namespace ManufacturersAndTheirProductsMaintenanceApp.Controllers
         [HttpPost("delete/{id}")]
         public IActionResult DeleteManufacturer(int id)
         {
+            var manufacturer = Repository.GetManufacturer(id);
+
+            if (manufacturer == null)
+            {
+                return NotFound();
+            }
+
             Repository.DeleteManufacturer(id);
             Response.Redirect(Request.PathBase);
             

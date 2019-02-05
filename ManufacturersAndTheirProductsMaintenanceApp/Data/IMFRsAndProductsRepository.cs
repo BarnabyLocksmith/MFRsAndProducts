@@ -20,5 +20,7 @@ namespace ManufacturersAndTheirProductsMaintenanceApp.Data
         void DeleteManufacturer(int id);
 
         void DeleteProduct(int mfrId, int productId);
+
+        bool IsProductExists(int id);
     }
 }
